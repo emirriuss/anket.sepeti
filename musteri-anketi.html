@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <link rel="icon" href="aharfi.jpg" type="image/x-icon">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Müşteri Anketi</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #ffffff;
+      color: #000000;
+      padding: 30px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #222;
+    }
+
+    form {
+      max-width: 700px;
+      margin: auto;
+      background: #f9f9f9;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.08);
+    }
+
+    label {
+      display: block;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: #fff;
+      color: #000;
+      resize: vertical;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 25px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      background-color: #3498db;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      min-width: 150px;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    .confirmation {
+      margin-top: 20px;
+      text-align: center;
+      color: green;
+      font-weight: bold;
+    }
+
+    .link-output {
+      margin-top: 10px;
+      text-align: center;
+      word-break: break-word;
+    }
+
+    .link-output a {
+      color: #0066cc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Müşteri Anketi</h1>
+  <form id="customerSurveyForm">
+    <label for="fullname">Adınız (isteğe bağlı):</label>
+    <textarea id="fullname" name="fullname" rows="2" placeholder="Adınızı yazabilirsiniz..."></textarea>
+
+    <label for="experience">Hizmetimizle ilgili genel deneyiminizi paylaşır mısınız?</label>
+    <textarea id="experience" name="experience" rows="4" placeholder="Deneyiminizi anlatın..."></textarea>
+
+    <label for="productFeedback">Ürün/hizmet hakkındaki düşünceleriniz nelerdir?</label>
+    <textarea id="productFeedback" name="productFeedback" rows="4" placeholder="Geri bildiriminizi yazın..."></textarea>
+
+    <label for="improvement">İyileştirilmesi gereken alanlar sizce nelerdir?</label>
+    <textarea id="improvement" name="improvement" rows="4" placeholder="Öneri ve eleştirileriniz..."></textarea>
+
+    <label for="extra">Eklemek istediğiniz başka bir görüşünüz var mı?</label>
+    <textarea id="extra" name="extra" rows="3" placeholder="Dilerseniz ek açıklama yazabilirsiniz..."></textarea>
+
+    <div class="btn-group">
+      <button type="submit">Gönder</button>
+      <button type="button" onclick="downloadJSON()">JSON İndir</button>
+      <button type="button" onclick="generateLink()">Link Oluştur</button>
+    </div>
+  </form>
+
+  <div class="confirmation" id="confirmationMessage"></div>
+  <div class="link-output" id="linkOutput"></div>
+
+  <script>
+    const form = document.getElementById("customerSurveyForm");
+
+    function getFormData() {
+      return {
+        fullname: document.getElementById("fullname").value,
+        experience: document.getElementById("experience").value,
+        productFeedback: document.getElementById("productFeedback").value,
+        improvement: document.getElementById("improvement").value,
+        extra: document.getElementById("extra").value,
+      };
+    }
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      document.getElementById("confirmationMessage").textContent =
+        "Teşekkür ederiz! Geri bildiriminiz kaydedildi.";
+      form.reset();
+    });
+
+    function downloadJSON() {
+      const data = getFormData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "musteri-anketi.json";
+      a.click();
+    }
+
+    function generateLink() {
+      const data = getFormData();
+      const encoded = encodeURIComponent(JSON.stringify(data));
+      const link = `${location.origin}${location.pathname}?data=${encoded}`;
+      document.getElementById("linkOutput").innerHTML =
+        `<strong>Paylaşılabilir Link:</strong><br><a href="${link}" target="_blank">${link}</a>`;
+    }
+
+    window.onload = function () {
+      const params = new URLSearchParams(window.location.search);
+      const data = params.get("data");
+      if (data) {
+        try {
+          const parsed = JSON.parse(decodeURIComponent(data));
+          for (const key in parsed) {
+            if (document.getElementById(key)) {
+              document.getElementById(key).value = parsed[key];
+            }
+          }
+        } catch (e) {
+          console.error("Geçersiz veri");
+        }
+      }
+    };
+  </script>
+</body>
+</html>

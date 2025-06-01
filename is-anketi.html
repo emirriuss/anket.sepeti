@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <link rel="icon" href="aharfi.jpg" type="image/x-icon">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>İş Anketi</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #ffffff;
+      color: #000000;
+      padding: 30px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    form {
+      max-width: 700px;
+      margin: 0 auto;
+      background-color: #f9f9f9;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+    }
+
+    label {
+      display: block;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background-color: #fff;
+      color: #000;
+      resize: vertical;
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background-color: #f1c40f;
+      color: #000;
+      border: none;
+      padding: 12px 20px;
+      margin-top: 25px;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      flex: 1;
+      min-width: 150px;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #e1b70d;
+    }
+
+    .confirmation {
+      margin-top: 20px;
+      color: green;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .link-output {
+      margin-top: 10px;
+      text-align: center;
+      word-break: break-word;
+      color: #333;
+    }
+
+    .link-output a {
+      color: #0077cc;
+    }
+  </style>
+</head>
+<body>
+  <h1>İş Anketi</h1>
+  <form id="businessSurveyForm">
+    <label for="name">Adınız (isteğe bağlı):</label>
+    <textarea id="name" name="name" rows="2" placeholder="Adınızı yazın..."></textarea>
+
+    <label for="jobSatisfaction">İşinizde en çok memnun kaldığınız konular nelerdir?</label>
+    <textarea id="jobSatisfaction" name="jobSatisfaction" rows="4" placeholder="Yorumunuzu yazın..."></textarea>
+
+    <label for="jobChallenges">İşinizde karşılaştığınız zorluklar nelerdir?</label>
+    <textarea id="jobChallenges" name="jobChallenges" rows="4" placeholder="Açıklayın..."></textarea>
+
+    <label for="companyCulture">Şirket kültürünü nasıl tanımlarsınız?</label>
+    <textarea id="companyCulture" name="companyCulture" rows="3" placeholder="Görüşlerinizi belirtin..."></textarea>
+
+    <label for="communication">İş yerindeki iç iletişim hakkında ne düşünüyorsunuz?</label>
+    <textarea id="communication" name="communication" rows="3" placeholder="Yorumlarınız..."></textarea>
+
+    <label for="managementFeedback">Yönetim ekibiyle ilgili geri bildirimleriniz nelerdir?</label>
+    <textarea id="managementFeedback" name="managementFeedback" rows="3" placeholder="Değerlendirmenizi yazın..."></textarea>
+
+    <label for="strategicPlanning">Şirketin stratejik planları hakkında düşünceleriniz:</label>
+    <textarea id="strategicPlanning" name="strategicPlanning" rows="4" placeholder="Fikirlerinizi paylaşın..."></textarea>
+
+    <label for="growthOpportunities">Kariyer gelişimi ve terfi olanaklarını nasıl değerlendirirsiniz?</label>
+    <textarea id="growthOpportunities" name="growthOpportunities" rows="3" placeholder="Görüşlerinizi yazın..."></textarea>
+
+    <label for="suggestions">Genel öneri ve yorumlarınız:</label>
+    <textarea id="suggestions" name="suggestions" rows="3" placeholder="Serbest şekilde görüşlerinizi belirtin..."></textarea>
+
+    <div class="btn-group">
+      <button type="submit">Gönder</button>
+      <button type="button" onclick="downloadJSON()">JSON Olarak İndir</button>
+      <button type="button" onclick="generateLink()">Link Oluştur</button>
+    </div>
+  </form>
+
+  <div class="confirmation" id="confirmationMessage"></div>
+  <div class="link-output" id="linkOutput"></div>
+
+  <script>
+    const form = document.getElementById("businessSurveyForm");
+
+    function getFormData() {
+      return {
+        name: document.getElementById("name").value,
+        jobSatisfaction: document.getElementById("jobSatisfaction").value,
+        jobChallenges: document.getElementById("jobChallenges").value,
+        companyCulture: document.getElementById("companyCulture").value,
+        communication: document.getElementById("communication").value,
+        managementFeedback: document.getElementById("managementFeedback").value,
+        strategicPlanning: document.getElementById("strategicPlanning").value,
+        growthOpportunities: document.getElementById("growthOpportunities").value,
+        suggestions: document.getElementById("suggestions").value
+      };
+    }
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const data = getFormData();
+      document.getElementById("confirmationMessage").textContent =
+        "Teşekkür ederiz! Geri bildiriminiz başarıyla alındı.";
+      form.reset();
+    });
+
+    function downloadJSON() {
+      const data = getFormData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "is-anketi.json";
+      a.click();
+    }
+
+    function generateLink() {
+      const data = getFormData();
+      const encoded = encodeURIComponent(JSON.stringify(data));
+      const link = `${location.origin}${location.pathname}?data=${encoded}`;
+      const output = document.getElementById("linkOutput");
+      output.innerHTML = `<strong>Paylaşılabilir Link:</strong><br><a href="${link}" target="_blank">${link}</a>`;
+    }
+
+    window.onload = function () {
+      const params = new URLSearchParams(window.location.search);
+      const data = params.get("data");
+      if (data) {
+        try {
+          const parsed = JSON.parse(decodeURIComponent(data));
+          for (const key in parsed) {
+            if (document.getElementById(key)) {
+              document.getElementById(key).value = parsed[key];
+            }
+          }
+        } catch (e) {
+          console.error("Veri çözümlenemedi.");
+        }
+      }
+    };
+  </script>
+</body>
+</html>

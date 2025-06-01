@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <link rel="icon" href="aharfi.jpg" type="image/x-icon">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kurumsal Anket</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #ffffff;
+      color: #000000;
+      padding: 30px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #222;
+    }
+
+    form {
+      max-width: 800px;
+      margin: auto;
+      background: #f9f9f9;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.08);
+    }
+
+    label {
+      display: block;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: #fff;
+      color: #000;
+      resize: vertical;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 25px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      background-color: #f39c12;
+      color: #000;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      min-width: 150px;
+    }
+
+    button:hover {
+      background-color: #e67e22;
+    }
+
+    .confirmation {
+      margin-top: 20px;
+      text-align: center;
+      color: green;
+      font-weight: bold;
+    }
+
+    .link-output {
+      margin-top: 10px;
+      text-align: center;
+      word-break: break-word;
+    }
+
+    .link-output a {
+      color: #0066cc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Kurumsal Anket</h1>
+  <form id="corporateSurveyForm">
+    <label for="name">Adınız (isteğe bağlı):</label>
+    <input type="text" id="name" name="name" />
+
+    <label for="engagement">Şirkete olan bağlılığınızı nasıl tanımlarsınız?</label>
+    <textarea id="engagement" name="engagement" rows="3"></textarea>
+
+    <label for="communication">İç iletişim süreçleri hakkındaki düşünceleriniz nelerdir?</label>
+    <textarea id="communication" name="communication" rows="3"></textarea>
+
+    <label for="managerFeedback">Yöneticilerinizden aldığınız geri bildirimler yeterli mi? Açıklayınız.</label>
+    <textarea id="managerFeedback" name="managerFeedback" rows="3"></textarea>
+
+    <label for="motivation">Motivasyonunuzu artıran unsurlar nelerdir?</label>
+    <textarea id="motivation" name="motivation" rows="3"></textarea>
+
+    <label for="challenges">İşinizde karşılaştığınız en büyük zorluklar nelerdir?</label>
+    <textarea id="challenges" name="challenges" rows="3"></textarea>
+
+    <label for="suggestions">Şirketin gelişmesi için önerileriniz nelerdir?</label>
+    <textarea id="suggestions" name="suggestions" rows="4"></textarea>
+
+    <label for="values">Şirket değerleri ile ne kadar uyum içindesiniz? Açıklayınız.</label>
+    <textarea id="values" name="values" rows="3"></textarea>
+
+    <label for="training">Kariyer gelişimi ve eğitim olanakları hakkında ne düşünüyorsunuz?</label>
+    <textarea id="training" name="training" rows="3"></textarea>
+
+    <label for="workLifeBalance">İş-özel hayat dengesini nasıl değerlendirirsiniz?</label>
+    <textarea id="workLifeBalance" name="workLifeBalance" rows="3"></textarea>
+
+    <div class="btn-group">
+      <button type="submit">Gönder</button>
+      <button type="button" onclick="downloadJSON()">JSON İndir</button>
+      <button type="button" onclick="generateLink()">Link Oluştur</button>
+    </div>
+  </form>
+
+  <div class="confirmation" id="confirmationMessage"></div>
+  <div class="link-output" id="linkOutput"></div>
+
+  <script>
+    const form = document.getElementById("corporateSurveyForm");
+
+    function getFormData() {
+      const fields = [
+        "name", "engagement", "communication", "managerFeedback",
+        "motivation", "challenges", "suggestions", "values",
+        "training", "workLifeBalance"
+      ];
+      const data = {};
+      fields.forEach(id => {
+        data[id] = document.getElementById(id).value;
+      });
+      return data;
+    }
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const data = getFormData();
+      document.getElementById("confirmationMessage").textContent =
+        "Teşekkürler! Geri bildiriminiz başarıyla alındı.";
+      form.reset();
+    });
+
+    function downloadJSON() {
+      const data = getFormData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "kurumsal-anket.json";
+      a.click();
+    }
+
+    function generateLink() {
+      const data = getFormData();
+      const encoded = encodeURIComponent(JSON.stringify(data));
+      const link = `${location.origin}${location.pathname}?data=${encoded}`;
+      document.getElementById("linkOutput").innerHTML =
+        `<strong>Paylaşılabilir Link:</strong><br><a href="${link}" target="_blank">${link}</a>`;
+    }
+
+    window.onload = function () {
+      const params = new URLSearchParams(window.location.search);
+      const data = params.get("data");
+      if (data) {
+        try {
+          const parsed = JSON.parse(decodeURIComponent(data));
+          for (const key in parsed) {
+            if (document.getElementById(key)) {
+              document.getElementById(key).value = parsed[key];
+            }
+          }
+        } catch (e) {
+          console.error("Geçersiz veri");
+        }
+      }
+    };
+  </script>
+</body>
+</html>
