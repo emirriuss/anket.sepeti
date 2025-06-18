@@ -69,14 +69,3 @@ emircangöktaş_030422037_anketoluşturmasitesi/
 │   └── emircangöktaş_030422037_anketoluşturmasitesi.docx → Yazılı rapor
 ```
 
----
-
-## 🔄 Nasıl Çalışır?
-
-1. `giris.html` veya `uye-ol.html` sayfası üzerinden kullanıcı sisteme giriş yapar ya da kayıt olur  
-2. Giriş başarılı olursa `localStorage` içine kullanıcı bilgileri kaydedilir  
-3. `index.html` veya diğer anket sayfalarına erişim sağlanabilir  
-4. Kullanıcı, sayfadaki anketi doldurur ve veriler backend'e gönderilmeye hazırdır  
-5. "Çıkış Yap" butonuna basıldığında `localStorage` temizlenir ve oturum sonlanır  
-
----
