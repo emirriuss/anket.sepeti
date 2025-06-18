@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <link rel="icon" href="aharfi.jpg" type="image/x-icon">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Giriş Yap</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fffef2;
+            color: #5a5a00;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .auth-container {
+            background: linear-gradient(135deg, #fffacd 0%, #f6e05e 100%);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(212, 175, 55, 0.3);
+            width: 100%;
+            max-width: 480px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #d4af37, #f6e05e, #d4af37);
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            color: #5a5a00;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #5a5a00;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #f6e05e;
+            border-radius: 12px;
+            background-color: #fffef8;
+            color: #5a5a00;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #d4af37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+            background-color: #fffbe6;
+        }
+
+        button {
+            background-color: #d4af37;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #e1c84c;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .switch-link {
+            text-align: center;
+            margin-top: 25px;
+            color: #7b7b00;
+            font-size: 0.95rem;
+        }
+
+        .switch-link a {
+            color: #d4af37;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .switch-link a:hover {
+            color: #9c8300;
+            text-decoration: underline;
+        }
+
+        .admin-container {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .admin-container.active {
+            display: block;
+        }
+
+        .admin-btn {
+            background-color: #9c8300 !important;
+        }
+
+        .admin-btn:hover {
+            background-color: #7b7b00 !important;
+        }
+
+        @media (max-width: 480px) {
+            .auth-container {
+                padding: 30px 20px;
+            }
+
+            h2 {
+                font-size: 1.8rem;
+            }
+
+            input {
+                padding: 10px 14px;
+            }
+
+            button {
+                padding: 12px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <h2 id="formTitle">Giriş Yap</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="loginEmail">E-posta</label>
+                <input type="email" id="loginEmail" placeholder="E-posta adresinizi girin" required />
+            </div>
+
+            <div class="form-group">
+                <label for="loginPassword">Şifre</label>
+                <input type="password" id="loginPassword" placeholder="Şifrenizi girin" required />
+            </div>
+
+            <button type="submit">Giriş Yap</button>
+
+            <p class="switch-link">
+                Hesabın yok mu? 
+                <a href="uye-ol.html">Üye Ol</a>
+            </p>
+        </form>
+
+        <div id="adminForm" class="admin-container">
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label for="adminEmail">Admin E-posta</label>
+                    <input type="email" id="adminEmail" placeholder="Admin e-posta adresini girin" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="adminPassword">Admin Şifre</label>
+                    <input type="password" id="adminPassword" placeholder="Admin şifresini girin" required />
+                </div>
+
+                <button type="submit" class="admin-btn">Admin Girişi</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Özelleştirilebilir Anket</title>
+  <link rel="icon" href="aharfi.jpg" type="image/x-icon">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fffef2;
+      color: #5a5a00;
+      padding: 30px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #6b5e00;
+    }
+
+    form {
+      max-width: 800px;
+      margin: auto;
+      background: #fffbe6;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .question-group {
+      margin-bottom: 20px;
+      background-color: #f9f7d9;
+      padding: 15px;
+      border-left: 4px solid #f6e05e;
+      position: relative;
+      border-radius: 10px;
+    }
+
+    .question-group label {
+      display: block;
+      font-weight: bold;
+      margin: 10px 0 6px;
+      color: #6b5e00;
+    }
+
+    .question-group textarea,
+    .question-group select,
+    .question-group input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #f6e05e;
+      border-radius: 10px;
+      resize: vertical;
+      background-color: #fff;
+      color: #5a5a00;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #e0a800;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+
+    button {
+      flex: 1;
+      min-width: 150px;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      background-color: #d4af37;
+      color: #fffef2;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #e1c84c;
+    }
+
+    .confirmation {
+      margin-top: 20px;
+      color: green;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .link-output {
+      margin-top: 15px;
+      text-align: center;
+      word-break: break-word;
+      color: #5a5a00;
+    }
+
+    .link-output a {
+      color: #b28100;
+    }
+
+    #addQuestion {
+      background-color: #ffc107;
+      color: #5a5a00;
+    }
+
+    #addQuestion:hover {
+      background-color: #e0a800;
+    }
+
+    .options-container > div {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+      gap: 10px;
+    }
+
+    .options-container button {
+      background-color: #b48a00;
+      flex: none;
+      min-width: auto;
+      padding: 6px 10px;
+    }
+
+    .answer-area {
+      display: none;
+    }
+
+    .answer-area textarea {
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Özelleştirilebilir Anket</h1>
+  <form id="customSurveyForm">
+    <div id="questionsContainer"></div>
+
+    <div class="btn-group">
+      <button type="button" id="addQuestion">Soru Ekle</button>
+      <button type="submit">Gönder</button>
+      <button type="button" onclick="downloadJSON()">JSON İndir</button>
+      <button type="button" onclick="generateLink()">Link Oluştur</button>
+    </div>
+  </form>
+
+  <div class="confirmation" id="confirmationMessage"></div>
+  <div class="link-output" id="linkOutput"></div>
+
+  <script>
+    let questionCount = 0;
+    const container = document.getElementById("questionsContainer");
+
+    function createQuestionElement(index, questionText = "", questionType = "text", options = []) {
+      const group = document.createElement("div");
+      group.className = "question-group";
+
+      group.innerHTML = `
+        <label>Soru ${index}:</label>
+        <textarea name="question${index}" rows="2" placeholder="Sorunuzu buraya yazın...">${questionText}</textarea>
+
+        <label>Soru Tipi:</label>
+        <select name="questionType${index}" onchange="toggleOptions(this, ${index})">
+          <option value="text" ${questionType === "text" ? "selected" : ""}>Açık Uçlu</option>
+          <option value="multiple" ${questionType === "multiple" ? "selected" : ""}>Çoktan Seçmeli</option>
+        </select>
+
+        <div class="options-container" id="options${index}" style="display: ${questionType === "multiple" ? "block" : "none"}">
+          ${options.map(opt => `
+            <div>
+              <input type="text" value="${opt}" placeholder="Şık metni" />
+              <button type="button" onclick="this.parentElement.remove()">Sil</button>
+            </div>
+          `).join("")}
+          <button type="button" onclick="addOption(${index})">Şık Ekle</button>
+        </div>
+
+        <div class="answer-area" id="answer${index}" style="display: ${questionType === "text" ? "block" : "none"}">
+          <label>Katılımcı Cevabı:</label>
+          <textarea rows="2" placeholder="Bu alan katılımcı tarafından doldurulacaktır..." disabled></textarea>
+        </div>
+
+        <button type="button" class="remove-btn" onclick="this.parentElement.remove()">Kaldır</button>
+      `;
+
+      return group;
+    }
+
+    document.getElementById("addQuestion").addEventListener("click", () => {
+      questionCount++;
+      const questionElement = createQuestionElement(questionCount);
+      container.appendChild(questionElement);
+    });
+
+    function toggleOptions(select, index) {
+      const optionsDiv = document.getElementById(`options${index}`);
+      const answerDiv = document.getElementById(`answer${index}`);
+      const type = select.value;
+      optionsDiv.style.display = type === "multiple" ? "block" : "none";
+      answerDiv.style.display = type === "text" ? "block" : "none";
+    }
+
+    function addOption(index) {
+      const container = document.getElementById(`options${index}`);
+      const div = document.createElement("div");
+      div.innerHTML = `
+        <input type="text" placeholder="Şık metni" />
+        <button type="button" onclick="this.parentElement.remove()">Sil</button>
+      `;
+      container.insertBefore(div, container.lastElementChild);
+    }
+
+    document.getElementById("customSurveyForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      document.getElementById("confirmationMessage").textContent =
+        "Teşekkürler! Geri bildiriminiz başarıyla alındı.";
+      this.reset();
+      container.innerHTML = "";
+      questionCount = 0;
+    });
+
+    function getFormData() {
+      const data = [];
+      const groups = container.querySelectorAll(".question-group");
+      groups.forEach((group, i) => {
+        const questionText = group.querySelector("textarea").value.trim();
+        const type = group.querySelector("select").value;
+        const questionObj = {
+          soru: questionText,
+          tur: type
+        };
+        if (type === "multiple") {
+          const options = [];
+          group.querySelectorAll(".options-container input").forEach(input => {
+            if (input.value.trim()) options.push(input.value.trim());
+          });
+          questionObj.siklar = options;
+        }
+        data.push(questionObj);
+      });
+      return data;
+    }
+
+    function downloadJSON() {
+      const data = getFormData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "ozel-anket.json";
+      a.click();
+    }
+
+    function generateLink() {
+      const data = getFormData();
+      const encoded = encodeURIComponent(JSON.stringify(data));
+      const link = `${location.origin}${location.pathname}?data=${encoded}`;
+      document.getElementById("linkOutput").innerHTML =
+        `<strong>Paylaşılabilir Link:</strong><br><a href="${link}" target="_blank">${link}</a>`;
+    }
+
+    window.onload = function () {
+      const params = new URLSearchParams(window.location.search);
+      const data = params.get("data");
+      if (data) {
+        try {
+          const parsed = JSON.parse(decodeURIComponent(data));
+          container.innerHTML = "";
+          questionCount = 0;
+          parsed.forEach((q, i) => {
+            const element = createQuestionElement(i + 1, q.soru, q.tur, q.siklar || []);
+            container.appendChild(element);
+            questionCount++;
+          });
+        } catch (e) {
+          console.error("Veri çözümlenemedi.");
+        }
+      } else {
+        document.getElementById("addQuestion").click(); // ilk soru otomatik gelsin
+      }
+    };
+  </script>
+</body>
+</html>

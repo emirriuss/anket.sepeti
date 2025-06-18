@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <link rel="icon" href="aharfi.jpg" type="image/x-icon">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Müşteri Anketi</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fffef2;
+      color: #5a5a00;
+      padding: 30px;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      text-align: center;
+      color: #6b5e00;
+      margin-bottom: 40px;
+    }
+
+    form {
+      max-width: 800px;
+      margin: auto;
+      background: #fffbe6;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    /* Adınız input için modern ve şık stil */
+    .label-floating {
+      position: relative;
+      margin-bottom: 40px;
+      font-weight: 600;
+      color: #5a5a00;
+      font-size: 16px;
+      display: block;
+      width: 100%;
+    }
+
+    .label-floating input {
+      width: 100%;
+      border: none;
+      border-bottom: 2px solid #d4af37;
+      padding: 10px 0;
+      font-size: 18px;
+      color: #5a5a00;
+      background: transparent;
+      transition: border-color 0.3s;
+      outline: none;
+      font-weight: 500;
+    }
+
+    .label-floating input::placeholder {
+      color: rgba(90, 90, 0, 0.5);
+      font-style: italic;
+    }
+
+    .label-floating input:focus {
+      border-color: #b28100;
+      box-shadow: 0 2px 8px rgba(178, 129, 0, 0.4);
+    }
+
+    .label-floating span {
+      position: absolute;
+      top: 12px;
+      left: 0;
+      pointer-events: none;
+      color: #bfae4f;
+      font-size: 16px;
+      transition: 0.3s ease all;
+    }
+
+    .label-floating input:focus ~ span,
+    .label-floating input:not(:placeholder-shown) ~ span {
+      top: -14px;
+      font-size: 12px;
+      color: #b28100;
+      font-weight: 700;
+    }
+
+    /* Sorular alanı */
+    .question-group {
+      margin-bottom: 25px;
+      background-color: #f9f7d9;
+      padding: 20px 25px 25px;
+      border-left: 5px solid #f6e05e;
+      position: relative;
+      border-radius: 10px;
+    }
+
+    .question-group label.question-label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 12px;
+      color: #6b5e00;
+      font-size: 18px;
+    }
+
+    /* Soru tipi seçimi */
+    .question-type {
+      margin-bottom: 15px;
+      font-weight: 600;
+      color: #5a5a00;
+    }
+
+    select {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1.5px solid #d4af37;
+      background: #fffbe6;
+      color: #5a5a00;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.3s;
+      min-width: 140px;
+    }
+    select:focus {
+      outline: none;
+      border-color: #b28100;
+      box-shadow: 0 0 6px rgba(178,129,0,0.4);
+    }
+
+    /* Açık uçlu textarea */
+    .answer-textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1.5px solid #f6e05e;
+      border-radius: 10px;
+      resize: vertical;
+      background-color: #fff;
+      color: #5a5a00;
+      font-size: 16px;
+      font-weight: 500;
+      min-height: 70px;
+      box-sizing: border-box;
+      transition: border-color 0.3s;
+    }
+    .answer-textarea:focus {
+      border-color: #b28100;
+      box-shadow: 0 0 6px rgba(178,129,0,0.4);
+      outline: none;
+    }
+
+    /* Çoktan seçmeli cevap alanı */
+    .multiple-choice-container {
+      margin-top: 10px;
+    }
+
+    .choice-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+
+    .choice-item input[type="text"] {
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1.5px solid #f6e05e;
+      font-size: 15px;
+      font-weight: 500;
+      transition: border-color 0.3s;
+    }
+    .choice-item input[type="text"]:focus {
+      border-color: #b28100;
+      outline: none;
+      box-shadow: 0 0 6px rgba(178,129,0,0.4);
+    }
+
+    .choice-item button.remove-choice-btn {
+      background: #e0a800;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+    .choice-item button.remove-choice-btn:hover {
+      background-color: #b28100;
+    }
+
+    .add-choice-btn {
+      background-color: #ffc107;
+      border: none;
+      color: #5a5a00;
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background-color 0.3s;
+      font-size: 15px;
+    }
+    .add-choice-btn:hover {
+      background-color: #e0a800;
+    }
+
+    /* Buton grubu */
+    .btn-group {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-top: 35px;
+    }
+
+    button[type="submit"],
+    button[type="button"] {
+      flex: 1;
+      min-width: 140px;
+      padding: 14px 20px;
+      font-size: 17px;
+      border: none;
+      border-radius: 12px;
+      background-color: #d4af37;
+      color: #fffef2;
+      cursor: pointer;
+      font-weight: 700;
+      transition: background-color 0.3s;
+      box-shadow: 0 3px 7px rgba(212,175,55,0.5);
+      user-select: none;
+    }
+    button[type="submit"]:hover,
+    button[type="button"]:hover {
+      background-color: #e1c84c;
+    }
+
+    .confirmation {
+      margin-top: 25px;
+      color: green;
+      text-align: center;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .link-output {
+      margin-top: 18px;
+      text-align: center;
+      word-break: break-word;
+      color: #5a5a00;
+      font-weight: 600;
+    }
+
+    .link-output a {
+      color: #b28100;
+      text-decoration: none;
+    }
+    .link-output a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>Müşteri Anketi</h1>
+  <form id="customSurveyForm" novalidate>
+
+    <!-- Adınız alanı (şık animasyonlu) -->
+    <label class="label-floating">
+      Adınız (isteğe bağlı):
+      <input type="text" name="fullname" placeholder=" " />
+      <span>Adınızı yazabilirsiniz</span>
+    </label>
+
+    <div id="questionsContainer">
+      <!-- Sorular sabit, silinemez -->
+      <div class="question-group" data-index="1">
+        <label class="question-label">Soru 1: Hizmetimizi nasıl değerlendirirsiniz?</label>
+        <div class="question-type">
+          Soru tipi:
+          <select class="question-type-select">
+            <option value="text">Açık Uçlu</option>
+            <option value="multiple">Çoktan Seçmeli</option>
+          </select>
+        </div>
+        <div class="answer-area">
+          <textarea class="answer-textarea" placeholder="Cevabınızı yazınız..."></textarea>
+        </div>
+      </div>
+
+      <div class="question-group" data-index="2">
+        <label class="question-label">Soru 2: En sevdiğiniz ürün hangisi?</label>
+        <div class="question-type">
+          Soru tipi:
+          <select class="question-type-select">
+            <option value="text">Açık Uçlu</option>
+            <option value="multiple">Çoktan Seçmeli</option>
+          </select>
+        </div>
+        <div class="answer-area">
+          <textarea class="answer-textarea" placeholder="Cevabınızı yazınız..."></textarea>
+        </div>
+      </div>
+
+      <div class="question-group" data-index="3">
+        <label class="question-label">Soru 3: Hizmetimizde geliştirilmesini istediğiniz alanlar nelerdir?</label>
+        <div class="question-type">
+          Soru tipi:
+          <select class="question-type-select">
+            <option value="text">Açık Uçlu</option>
+            <option value="multiple">Çoktan Seçmeli</option>
+          </select>
+        </div>
+        <div class="answer-area">
+          <textarea class="answer-textarea" placeholder="Cevabınızı yazınız..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button type="submit">Gönder</button>
+      <button type="button" onclick="downloadJSON()">JSON İndir</button>
+      <button type="button" onclick="generateLink()">Link Oluştur</button>
+    </div>
+  </form>
+
+  <div class="confirmation" id="confirmationMessage"></div>
+  <div class="link-output" id="linkOutput"></div>
+
+  <script>
+    const form = document.getElementById("customSurveyForm");
+    const questionsContainer = document.getElementById("questionsContainer");
+
+    // Soru tipine göre cevap alanını güncelleyen fonksiyon
+    function updateAnswerArea(questionGroup) {
+      const select = questionGroup.querySelector(".question-type-select");
+      const answerArea = questionGroup.querySelector(".answer-area");
+
+      if (select.value === "text") {
+        // Açık uçluysa textarea göster, çoktan seçmeli alanı kaldır
+        answerArea.innerHTML = `<textarea class="answer-textarea" placeholder="Cevabınızı yazınız..."></textarea>`;
+      } else if (select.value === "multiple") {
+        // Çoktan seçmeli alanı oluştur
+        answerArea.innerHTML = `
+          <div class="multiple-choice-container">
+            <div class="choice-item">
+              <input type="text" class="choice-input" placeholder="Şık ekle..." />
+              <button type="button" class="remove-choice-btn" title="Şıkkı kaldır">×</button>
+            </div>
+            <button type="button" class="add-choice-btn">Şık Ekle</button>
+          </div>
+        `;
+
+        // Şık ekleme ve silme fonksiyonlarını ata
+        const addChoiceBtn = answerArea.querySelector(".add-choice-btn");
+        addChoiceBtn.addEventListener("click", () => {
+          const container = answerArea.querySelector(".multiple-choice-container");
+          const newChoice = document.createElement("div");
+          newChoice.className = "choice-item";
+          newChoice.innerHTML = `
+            <input type="text" class="choice-input" placeholder="Şık ekle..." />
+            <button type="button" class="remove-choice-btn" title="Şıkkı kaldır">×</button>
+          `;
+          container.insertBefore(newChoice, addChoiceBtn);
+
+          // Yeni şıkkın silme butonuna event ekle
+          newChoice.querySelector(".remove-choice-btn").addEventListener("click", () => {
+            newChoice.remove();
+          });
+        });
+
+        // Mevcut ilk şıkkın silme butonuna event ata
+        const firstRemoveBtn = answerArea.querySelector(".remove-choice-btn");
+        firstRemoveBtn.addEventListener("click", (e) => {
+          e.target.closest(".choice-item").remove();
+        });
+      }
+    }
+
+    // Başlangıçta tüm sorular için cevap alanlarını ayarla
+    [...questionsContainer.querySelectorAll(".question-group")].forEach(qg => {
+      updateAnswerArea(qg);
+      // Soru tipi değişince cevap alanını güncelle
+      qg.querySelector(".question-type-select").addEventListener("change", () => {
+        updateAnswerArea(qg);
+      });
+    });
+
+    // Form verisini al
+    function getFormData() {
+      const data = {};
+      // Ad soyad
+      const fullname = form.querySelector('input[name="fullname"]').value.trim();
+      data["fullname"] = fullname;
+
+      const questionGroups = [...questionsContainer.querySelectorAll(".question-group")];
+      questionGroups.forEach((qg, idx) => {
+        const qIndex = idx + 1;
+        const qLabel = qg.querySelector(".question-label").textContent.trim();
+        const qType = qg.querySelector(".question-type-select").value;
+
+        let answer = "";
+        if (qType === "text") {
+          answer = qg.querySelector("textarea.answer-textarea").value.trim();
+        } else if (qType === "multiple") {
+          const choices = [...qg.querySelectorAll(".choice-input")].map(input => input.value.trim()).filter(v => v);
+          answer = choices;
+        }
+
+        data[`soru${qIndex}`] = {
+          soruMetni: qLabel,
+          soruTipi: qType,
+          cevap: answer
+        };
+      });
+
+      return data;
+    }
+
+    // Form gönderildiğinde
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      document.getElementById("confirmationMessage").textContent =
+        "Teşekkürler! Geri bildiriminiz başarıyla alındı.";
+      form.reset();
+      // Reset sonrası cevap alanlarını tekrar güncelle (varsayılan açık uçlu)
+      [...questionsContainer.querySelectorAll(".question-group")].forEach(qg => {
+        updateAnswerArea(qg);
+      });
+      document.getElementById("linkOutput").textContent = "";
+    });
+
+    // JSON indir
+    function downloadJSON() {
+      const data = getFormData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "ozel-anket.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Link oluştur
+    function generateLink() {
+      const data = getFormData();
+      const encoded = encodeURIComponent(JSON.stringify(data));
+      const link = `${location.origin}${location.pathname}?data=${encoded}`;
+      document.getElementById("linkOutput").innerHTML =
+        `<strong>Paylaşılabilir Link:</strong><br><a href="${link}" target="_blank" rel="noopener noreferrer">${link}</a>`;
+    }
+
+    // URL'den veri gelirse formu doldur
+    window.onload = () => {
+      const params = new URLSearchParams(window.location.search);
+      const data = params.get("data");
+      if (data) {
+        try {
+          const parsed = JSON.parse(decodeURIComponent(data));
+
+          // Ad soyad
+          if(parsed.fullname) {
+            form.querySelector('input[name="fullname"]').value = parsed.fullname;
+          }
+
+          const questionGroups = [...questionsContainer.querySelectorAll(".question-group")];
+
+          questionGroups.forEach((qg, idx) => {
+            const qIndex = idx + 1;
+            const key = `soru${qIndex}`;
+            if (parsed[key]) {
+              const qData = parsed[key];
+              // Soru tipi
+              const select = qg.querySelector(".question-type-select");
+              select.value = qData.soruTipi || "text";
+              updateAnswerArea(qg);
+
+              if (qData.soruTipi === "text") {
+                qg.querySelector("textarea.answer-textarea").value = qData.cevap || "";
+              } else if (qData.soruTipi === "multiple" && Array.isArray(qData.cevap)) {
+                const container = qg.querySelector(".multiple-choice-container");
+                if (container) {
+                  container.querySelectorAll(".choice-item").forEach(item => item.remove()); // temizle
+                  qData.cevap.forEach(choiceText => {
+                    const newChoice = document.createElement("div");
+                    newChoice.className = "choice-item";
+                    newChoice.innerHTML = `
+                      <input type="text" class="choice-input" placeholder="Şık ekle..." />
+                      <button type="button" class="remove-choice-btn" title="Şıkkı kaldır">×</button>
+                    `;
+                    newChoice.querySelector(".choice-input").value = choiceText;
+                    container.insertBefore(newChoice, container.querySelector(".add-choice-btn"));
+
+                    newChoice.querySelector(".remove-choice-btn").addEventListener("click", () => {
+                      newChoice.remove();
+                    });
+                  });
+                }
+              }
+            }
+          });
+        } catch (error) {
+          console.error("Geçersiz veri URL'den yüklenemedi.");
+        }
+      }
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kurumsal Anket</title>
+  <link rel="icon" href="aharfi.jpg" type="image/x-icon" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fffef2;
+      color: #5a5a00;
+      padding: 30px;
+    }
+    h1 {
+      text-align: center;
+      color: #6b5e00;
+    }
+    form {
+      max-width: 800px;
+      margin: auto;
+      background: #fffbe6;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    .question-group {
+      margin-bottom: 20px;
+      background-color: #f9f7d9;
+      padding: 15px;
+      border-left: 4px solid #f6e05e;
+      position: relative;
+      border-radius: 10px;
+    }
+    .question-group label {
+      display: block;
+      font-weight: bold;
+      margin: 10px 0 6px;
+      color: #6b5e00;
+    }
+    .question-group textarea,
+    .question-group select,
+    .question-group input[type='text'] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #f6e05e;
+      border-radius: 10px;
+      resize: vertical;
+      background-color: #fff;
+      color: #5a5a00;
+    }
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 30px;
+      justify-content: center;
+    }
+    button {
+      padding: 12px 18px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      background-color: #d4af37;
+      color: #fffef2;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #e1c84c;
+    }
+    .options-container > div {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+      gap: 10px;
+    }
+    .options-container button {
+      background-color: #b48a00;
+      flex: none;
+      min-width: auto;
+      padding: 6px 10px;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .answer-area {
+      display: none;
+    }
+    .answer-area textarea {
+      margin-top: 5px;
+    }
+    select {
+      background-color: #fff;
+    }
+    .download-section {
+      margin-top: 20px;
+      text-align: center;
+      word-break: break-word;
+    }
+    .download-section input[type="text"] {
+      width: 100%;
+      max-width: 600px;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #d4af37;
+      border-radius: 10px;
+      background: #fffbe6;
+      color: #5a5a00;
+      user-select: all; /* Kolay kopyalama için */
+      cursor: text;
+    }
+    .copy-btn {
+      margin-top: 10px;
+      padding: 8px 14px;
+      background-color: #b48a00;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: background-color 0.3s;
+    }
+    .copy-btn:hover {
+      background-color: #a27c00;
+    }
+  </style>
+</head>
+<body>
+  <h1>Kurumsal Geri Bildirim Anketi</h1>
+  <form id="surveyForm">
+    <div id="questionsContainer"></div>
+    <div class="btn-group">
+      <button type="submit">Gönder</button>
+      <button type="button" id="shareBtn">Paylaş</button>
+      <button type="button" id="downloadBtn">İndir</button>
+    </div>
+  </form>
+
+  <div class="download-section" id="downloadSection" style="display: none;">
+    <p>Paylaşılabilir Link:</p>
+    <input type="text" id="shareableLink" readonly />
+    <button class="copy-btn" id="copyLinkBtn">Kopyala</button>
+  </div>
+
+  <script>
+    const questions = [
+      "1. Şirkete olan bağlılığınızı nasıl tanımlarsınız?",
+      "2. İç iletişim süreçleri hakkındaki düşünceleriniz nelerdir?",
+      "3. Yöneticinizden yeterli geri bildirim alıyor musunuz?",
+      "4. İş yerinde kendinizi değerli hissediyor musunuz?",
+      "5. Mevcut pozisyonunuz gelişiminize katkı sağlıyor mu?",
+      "6. Ekip çalışması hakkında ne düşünüyorsunuz?",
+      "7. Şirketin vizyon ve misyonunu ne derece benimsiyorsunuz?",
+      "8. Şirket içi eğitimleri yeterli buluyor musunuz?",
+      "9. İş-yaşam dengesi hakkında ne düşünüyorsunuz?",
+      "10. Şirket hakkında başka eklemek istediğiniz düşünceleriniz var mı?"
+    ];
+
+    const container = document.getElementById("questionsContainer");
+
+    function createQuestions() {
+      container.innerHTML = "";
+      questions.forEach((qText, i) => {
+        const qNum = i + 1;
+        const group = document.createElement("div");
+        group.className = "question-group";
+        group.innerHTML = `
+          <label>${qText}</label>
+          <select onchange="toggleType(this)">
+            <option value="text">Açık Uçlu</option>
+            <option value="multiple">Çoktan Seçmeli</option>
+          </select>
+          <div class="answer-area text-answer" style="display: block;">
+            <textarea rows="3" name="q${qNum}_text"></textarea>
+          </div>
+          <div class="answer-area multiple-choice">
+            <div class="options-container"></div>
+            <button type="button" onclick="addOption(this)">Şık Ekle</button>
+          </div>
+        `;
+        container.appendChild(group);
+      });
+    }
+
+    createQuestions();
+
+    function toggleType(select) {
+      const group = select.closest(".question-group");
+      const text = group.querySelector(".text-answer");
+      const multi = group.querySelector(".multiple-choice");
+      if (select.value === "text") {
+        text.style.display = "block";
+        multi.style.display = "none";
+      } else {
+        text.style.display = "none";
+        multi.style.display = "block";
+      }
+    }
+
+    function addOption(button) {
+      const container = button.previousElementSibling;
+      const optionDiv = document.createElement("div");
+      optionDiv.innerHTML = `
+        <input type="text" placeholder="Şık girin" />
+        <button type="button" onclick="this.parentElement.remove()">Sil</button>
+      `;
+      container.appendChild(optionDiv);
+    }
+
+    function gatherFormData() {
+      const form = document.getElementById("surveyForm");
+      const data = {};
+      const groups = form.querySelectorAll(".question-group");
+
+      groups.forEach((group, index) => {
+        const question = questions[index];
+        const select = group.querySelector("select");
+        const type = select.value;
+
+        if (type === "text") {
+          const answer = group.querySelector("textarea").value.trim();
+          data[`Soru ${index + 1}`] = { soru: question, tip: "Açık Uçlu", cevap: answer };
+        } else {
+          const options = [...group.querySelectorAll(".multiple-choice .options-container input")];
+          const values = options.map((opt) => opt.value.trim()).filter(Boolean);
+          data[`Soru ${index + 1}`] = { soru: question, tip: "Çoktan Seçmeli", şıklar: values };
+        }
+      });
+
+      return data;
+    }
+
+    // Gönder butonu tıklandığında sadece uyarı göster
+    document.getElementById("surveyForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      alert("Gönderildi");
+    });
+
+    // İndir butonu
+    document.getElementById("downloadBtn").addEventListener("click", () => {
+      const data = gatherFormData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "anket.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // Paylaş butonu
+    document.getElementById("shareBtn").addEventListener("click", () => {
+      const data = gatherFormData();
+      const encoded = encodeURIComponent(JSON.stringify(data));
+      const link = `${location.origin}${location.pathname}?data=${encoded}`;
+
+      const downloadSection = document.getElementById("downloadSection");
+      downloadSection.style.display = "block";
+
+      const input = document.getElementById("shareableLink");
+      input.value = link;
+
+      input.focus();
+      input.select();
+    });
+
+    // Kopyala butonu
+    document.getElementById("copyLinkBtn").addEventListener("click", () => {
+      const input = document.getElementById("shareableLink");
+      input.select();
+      input.setSelectionRange(0, 99999); // Mobil için
+      navigator.clipboard.writeText(input.value).then(() => {
+        alert("Link kopyalandı!");
+      }).catch(() => {
+        alert("Kopyalama başarısız oldu. Lütfen elle kopyalayın.");
+      });
+    });
+
+    // URL parametrelerinden formu doldur
+    window.onload = function () {
+      const params = new URLSearchParams(window.location.search);
+      const encodedData = params.get("data");
+
+      if (encodedData) {
+        try {
+          const jsonData = JSON.parse(decodeURIComponent(encodedData));
+          container.innerHTML = "";
+          Object.keys(jsonData).forEach((key, index) => {
+            const entry = jsonData[key];
+            const group = document.createElement("div");
+            group.className = "question-group";
+
+            const questionText = entry.soru || questions[index] || `Soru ${index + 1}`;
+            const isText = entry.tip === "Açık Uçlu";
+            const isMultiple = entry.tip === "Çoktan Seçmeli";
+
+            group.innerHTML = `
+              <label>${questionText}</label>
+              <select onchange="toggleType(this)">
+                <option value="text" ${isText ? "selected" : ""}>Açık Uçlu</option>
+                <option value="multiple" ${isMultiple ? "selected" : ""}>Çoktan Seçmeli</option>
+              </select>
+              <div class="answer-area text-answer" style="display: ${isText ? "block" : "none"};">
+                <textarea rows="3">${isText ? (entry.cevap || "") : ""}</textarea>
+              </div>
+              <div class="answer-area multiple-choice" style="display: ${isMultiple ? "block" : "none"};">
+                <div class="options-container"></div>
+                <button type="button" onclick="addOption(this)">Şık Ekle</button>
+              </div>
+            `;
+
+            container.appendChild(group);
+
+            if (isMultiple && Array.isArray(entry.şıklar)) {
+              const optionsContainer = group.querySelector(".options-container");
+              entry.şıklar.forEach((optText) => {
+                if (optText.trim() !== "") {
+                  const optionDiv = document.createElement("div");
+                  optionDiv.innerHTML = `
+                    <input type="text" placeholder="Şık girin" value="${optText}" />
+                    <button type="button" onclick="this.parentElement.remove()">Sil</button>
+                  `;
+                  optionsContainer.appendChild(optionDiv);
+                }
+              });
+            }
+          });
+        } catch (e) {
+          alert("URL parametresinden anket verisi yüklenirken hata oluştu.");
+          createQuestions();
+        }
+      }
+    };
+  </script>
+</body>
+</html>
